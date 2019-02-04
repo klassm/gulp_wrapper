@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+CWD=$PWD
+until [ $CWD == / ]; do
+    GULP=$CWD/node_modules/.bin/gulp
+    if [ -e $GULP ]; then
+        exec $GULP "$@"
+    fi
+    CWD=$(dirname $CWD)
+done
+if [ -f $DEFAULT_GULP ]; then
+  echo No Gulp found, using `which gulp`
+  exec gulp $@
+fi
