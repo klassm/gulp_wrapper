@@ -1,13 +1,33 @@
-#!/usr/bin/env bash
-CWD=$PWD
-until [ $CWD == / ]; do
-    GULP=$CWD/node_modules/.bin/gulp
-    if [ -e $GULP ]; then
-        exec $GULP "$@"
-    fi
-    CWD=$(dirname $CWD)
-done
-if [ -f $DEFAULT_GULP ]; then
-  echo No Gulp found, using `which gulp`
-  exec gulp $@
-fi
+#!/usr/bin/env python3
+
+import os
+import os.path
+import sys
+
+gulpCmd = 'node_modules/.bin/gulp'
+cwd = os.getcwd()
+args = sys.argv
+
+
+def findGulpDir(directory):
+    if os.path.exists(os.path.join(directory, gulpCmd)):
+        return directory
+
+    if directory == '/':
+        return None
+
+    return findGulpDir(os.path.abspath(os.path.join(directory, os.pardir)))
+
+
+def execute(directory, gulpParams):
+    os.system("cd " + directory + " && " + gulpCmd + " " + gulpParams)
+
+
+gulpDir = findGulpDir(cwd)
+
+if gulpDir is None:
+    print('Could not find gulp')
+    sys.exit(1)
+
+args = ' '.join(args[1:])
+execute(gulpDir, args)
