@@ -1,0 +1,6 @@
+#compdef gulpw
+
+local -a completions
+completions=$(gulpw --tasks-simple 2>/dev/null)
+lines=("${(f)completions}")
+compadd $lines
